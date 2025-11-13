@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechBlog Editor - Problemas Corregidos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --terminal: #0f172a;
+            --terminal-text: #94a3b8;
+            --terminal-green: #22c55e;
+            --terminal-blue: #3b82f6;
+            --terminal-yellow: #eab308;
+            --border: #e2e8f0;
+            --codesnap-bg: #2d2d2d;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: #334155;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--terminal);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--terminal-green);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: var(--terminal-green);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            color: var(--terminal-text);
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+            gap: 0;
+        }
+
+        .editor-section {
+            flex: 1;
+            min-width: 300px;
+            border-right: 1px solid var(--border);
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 300px;
+            background: #f9fafb;
+        }
+
+        .section-title {
+            background: #f1f5f9;
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 15px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 2px;
+            padding: 0 8px;
+            border-right: 1px solid var(--border);
+        }
+
+        .toolbar button {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--dark);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toolbar button:hover {
+            background: #eff6ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .toolbar select,
+        .toolbar input {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            color: var(--dark);
+        }
+
+        .editor-container {
+            padding: 20px;
+        }
+
+        #post-title {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        #post-content {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            resize: vertical;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            outline: none;
+        }
+
+        #post-content:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .cursor-info {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            border-left: 4px solid var(--primary);
+        }
+
+        .preview-container {
+            padding: 25px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        #post-preview {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            min-height: 500px;
+        }
+
+        .blog-post h1 {
+            color: var(--dark);
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .blog-post h2 {
+            color: var(--primary);
+            margin: 25px 0 15px;
+        }
+
+        .blog-post p {
+            margin-bottom: 16px;
+            line-height: 1.8;
+        }
+
+        .blog-post img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ESTILOS PARA CENTRAR IMÁGENES - AGREGADOS */
+        .image-center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .image-left {
+            display: block;
+            margin-right: auto;
+        }
+
+        .image-right {
+            display: block;
+            margin-left: auto;
+        }
+
+        .blog-post a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .blog-post a:hover {
+            text-decoration: underline;
+        }
+
+        .blog-post blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 20px;
+            margin: 20px 0;
+            color: var(--secondary);
+            font-style: italic;
+        }
+
+        /* Estilos para iconos en línea - CORREGIDOS */
+        .inline-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
+            vertical-align: middle;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .icon-small {
+            font-size: 14px;
+        }
+
+        .icon-medium {
+            font-size: 18px;
+        }
+
+        .icon-large {
+            font-size: 24px;
+        }
+
+        .icon-x-large {
+            font-size: 32px;
+        }
+
+        /* Estilos para la terminal mejorada - CORREGIDOS */
+        .terminal {
+            background: var(--terminal);
+            color: var(--terminal-text);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-control.close {
+            background: #ef4444;
+        }
+
+        .terminal-control.minimize {
+            background: #f59e0b;
+        }
+
+        .terminal-control.maximize {
+            background: #10b981;
+        }
+
+        .terminal-title {
+            color: var(--terminal-text);
+            font-size: 0.9rem;
+        }
+
+        .terminal-body {
+            line-height: 1.5;
+        }
+
+        .terminal .prompt {
+            color: var(--terminal-green);
+            margin-right: 8px;
+        }
+
+        .terminal .command {
+            color: var(--terminal-blue);
+            font-weight: 500;
+        }
+
+        .terminal .comment {
+            color: var(--terminal-yellow);
+            font-style: italic;
+        }
+
+        .terminal .output {
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+
+        .terminal .output .dir {
+            color: var(--terminal-blue);
+        }
+
+        .terminal .output .file {
+            color: var(--terminal-text);
+        }
+
+        .terminal .output .highlight {
+            color: var(--terminal-green);
+            font-weight: bold;
+        }
+
+        /* Estilos para CodeSnap */
+        .codesnap {
+            background: var(--codesnap-bg);
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .codesnap-header {
+            background: #3d3d3d;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .codesnap-window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .codesnap-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .codesnap-control.red {
+            background: #ff5f56;
+        }
+
+        .codesnap-control.yellow {
+            background: #ffbd2e;
+        }
+
+        .codesnap-control.green {
+            background: #27c93f;
+        }
+
+        .codesnap-body {
+            padding: 0;
+            margin: 0;
+        }
+
+        .codesnap pre {
+            margin: 0;
+            padding: 15px;
+            border-radius: 0;
+            overflow-x: auto;
+        }
+
+        .codesnap code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .codesnap-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 15px;
+            background: #3d3d3d;
+            gap: 10px;
+        }
+
+        .codesnap-btn {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .codesnap-btn:hover {
+            background: #666;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #ccc;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .code-lang {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .icon-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .icon-item.selected {
+            background-color: #eff6ff;
+            border: 2px solid var(--primary);
+        }
+
+        .icon-item i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .icon-name {
+            font-size: 0.7rem;
+            text-align: center;
+            color: var(--secondary);
+        }
+
+        .icon-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .icon-preview i {
+            font-size: 32px;
+        }
+
+        .icon-size-control,
+        .icon-color-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .btn-terminal {
+            background-color: var(--terminal);
+            color: white;
+        }
+
+        .btn-terminal:hover {
+            background-color: #020617;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--secondary);
+        }
+
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .terminal-commands {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .terminal-btn {
+            padding: 8px;
+            background: var(--terminal);
+            color: var(--terminal-text);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-btn:hover {
+            background: #1e293b;
+        }
+
+        .icon-categories {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .icon-category-btn {
+            padding: 5px 10px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .icon-category-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .editor-section {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .terminal-commands {
+                grid-template-columns: 1fr;
+            }
+
+            .icon-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .icon-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>TechBlog Editor</h1>
+            <p class="subtitle">Iconos y terminal</p>
+        </header>
+
+        <div class="main-content">
+            <section class="editor-section">
+                <div class="section-title">
+                    <i class="fas fa-edit"></i>
+                    <span>Editor</span>
+                </div>
+
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <button title="Negrita" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+                        <button title="Cursiva" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+                        <button title="Subrayado" onclick="formatText('underline')"><i
+                                class="fas fa-underline"></i></button>
+                    </div>
+
+                    <div class="toolbar-group">
+                        <button title="Alinear izquierda" onclick="formatText('justifyLeft')"><i
+                                class="fas fa-align-left"></i></button>
+                        <button title="Centrar" onclick="formatText('justifyCenter')"><i
+                                class="fas fa-align-center"></i></button>
+                        <button title="Alinear derecha" onclick="formatText('justifyRight')"><i
+                                class="fas fa-align-right"></i></button>
+                        <button title="Justificar" onclick="formatText('justifyFull')"><i
+                                class="fas fa-align-justify"></i></button>
+                    </div>
+
+                    <div class="toolbar-group">
+                        <button title="Lista numerada" onclick="formatText('insertOrderedList')"><i
+                                class="fas fa-list-ol"></i></button>
+                        <button title="Lista con viñetas" onclick="formatText('insertUnorderedList')"><i
+                                class="fas fa-list-ul"></i></button>
+                        <button title="Sangría" onclick="formatText('indent')"><i class="fas fa-indent"></i></button>
+                        <button title="Quitar sangría" onclick="formatText('outdent')"><i
+                                class="fas fa-outdent"></i></button>
+                    </div>
+
+                    <div class="toolbar-group">
+                        <button title="Insertar enlace" onclick="showLinkModal()"><i class="fas fa-link"></i></button>
+                        <button title="Insertar imagen" onclick="showImageModal()"><i class="fas fa-image"></i></button>
+                        <button title="Insertar tabla" onclick="showTableModal()"><i class="fas fa-table"></i></button>
+                        <button title="Insertar icono" onclick="showIconModal()"><i class="fas fa-icons"></i></button>
+                    </div>
+
+                    <div class="toolbar-group">
+                        <select id="fontFamily" onchange="formatText('fontName', this.value)">
+                            <option value="Arial">Arial</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Segoe UI">Segoe UI</option>
+                        </select>
+
+                        <select id="fontSize" onchange="formatText('fontSize', this.value)">
+                            <option value="1">10px</option>
+                            <option value="2">13px</option>
+                            <option value="3" selected>16px</option>
+                            <option value="4">18px</option>
+                            <option value="5">24px</option>
+                            <option value="6">32px</option>
+                            <option value="7">48px</option>
+                        </select>
+                    </div>
+
+                    <div class="toolbar-group">
+                        <button title="Color de texto" onclick="showColorModal('forecolor')"><i
+                                class="fas fa-palette"></i></button>
+                        <button title="Color de fondo" onclick="showColorModal('backcolor')"><i
+                                class="fas fa-fill"></i></button>
+                    </div>
+
+                    <div class="toolbar-group">
+                        <button title="Insertar terminal" onclick="showTerminalModal()"><i
+                                class="fas fa-terminal"></i></button>
+                        <button title="Insertar código" onclick="showCodeModal()"><i class="fas fa-code"></i></button>
+                        <button title="Insertar CodeSnap" onclick="showCodeSnapModal()"><i
+                                class="fas fa-camera"></i></button>
+                        <button title="Insertar video" onclick="showVideoModal()"><i class="fas fa-video"></i></button>
+                    </div>
+                </div>
+
+                <div class="editor-container">
+                    <input type="text" id="post-title" placeholder="Título de la entrada...">
+
+                    <div class="cursor-info" id="cursor-info">
+                        💡 <strong>Posición del cursor:</strong> Haz clic en cualquier parte del texto para posicionar
+                        el cursor. Todos los elementos se insertarán exactamente donde está el cursor.
+                    </div>
+
+                    <div id="post-content" contenteditable="true">
+                        <p>¡Bienvenido al editor! Este es un texto de ejemplo.</p>
+                        <p>Puedes hacer clic en cualquier parte de este texto y luego insertar elementos exactamente en
+                            esa posición.</p>
+                        <p>Prueba a colocar el cursor aquí → [posición] ← y luego insertar un icono, imagen, tabla, etc.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="preview-section">
+                <div class="section-title">
+                    <i class="fas fa-eye"></i>
+                    <span>Vista Previa</span>
+                </div>
+                <div class="preview-container">
+                    <div id="post-preview" class="blog-post">
+                        <p>La vista previa de tu entrada aparecerá aquí...</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="clearContent()">
+                <i class="fas fa-trash"></i> Limpiar
+            </button>
+            <button class="btn btn-terminal" onclick="showTerminalModal()">
+                <i class="fas fa-terminal"></i> Terminal
+            </button>
+            <button class="btn btn-primary" onclick="generateHTML()">
+                <i class="fas fa-code"></i> Generar HTML
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para insertar enlaces -->
+    <div id="linkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Insertar enlace</h3>
+                <span class="close" onclick="closeModal('linkModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="link-url">URL del enlace</label>
+                <input type="text" id="link-url" placeholder="https://ejemplo.com">
+            </div>
+            <div class="form-group">
+                <label for="link-text">Texto del enlace</label>
+                <input type="text" id="link-text" placeholder="Texto visible">
+            </div>
+            <button class="btn btn-primary" onclick="insertElementAtCursor('link')">Insertar</button>
+        </div>
+    </div>
+
+    <!-- Modal para insertar imágenes - MODIFICADO PARA INCLUIR ALINEACIÓN -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Insertar imagen</h3>
+                <span class="close" onclick="closeModal('imageModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="image-url">URL de la imagen</label>
+                <input type="text" id="image-url" placeholder="https://ejemplo.com/imagen.jpg">
+            </div>
+            <div class="form-group">
+                <label for="image-alt">Texto alternativo</label>
+                <input type="text" id="image-alt" placeholder="Descripción de la imagen">
+            </div>
+            <div class="form-group">
+                <label for="image-width">Ancho (px o %)</label>
+                <input type="text" id="image-width" placeholder="Ej: 400 o 100%">
+            </div>
+            <!-- NUEVO: Selector de alineación -->
+            <div class="form-group">
+                <label for="image-align">Alineación</label>
+                <select id="image-align">
+                    <option value="left">Izquierda</option>
+                    <option value="center" selected>Centro</option>
+                    <option value="right">Derecha</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="insertElementAtCursor('image')">Insertar</button>
+        </div>
+    </div>
+
+    <!-- Modal para insertar videos -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Insertar video</h3>
+                <span class="close" onclick="closeModal('videoModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="video-url">URL del video (YouTube, Vimeo, etc.)</label>
+                <input type="text" id="video-url" placeholder="https://youtube.com/embed/VIDEO_ID">
+            </div>
+            <div class="form-group">
+                <label for="video-width">Ancho</label>
+                <input type="text" id="video-width" value="560" placeholder="560">
+            </div>
+            <div class="form-group">
+                <label for="video-height">Alto</label>
+                <input type="text" id="video-height" value="315" placeholder="315">
+            </div>
+            <button class="btn btn-primary" onclick="insertElementAtCursor('video')">Insertar</button>
+        </div>
+    </div>
+
+    <!-- Modal para insertar tablas -->
+    <div id="tableModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Insertar tabla</h3>
+                <span class="close" onclick="closeModal('tableModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="table-rows">Filas</label>
+                <input type="number" id="table-rows" min="1" value="3">
+            </div>
+            <div class="form-group">
+                <label for="table-cols">Columnas</label>
+                <input type="number" id="table-cols" min="1" value="3">
+            </div>
+            <div class="form-group">
+                <label for="table-header">Incluir fila de encabezado</label>
+                <input type="checkbox" id="table-header" checked>
+            </div>
+            <button class="btn btn-primary" onclick="insertElementAtCursor('table')">Insertar tabla</button>
+        </div>
+    </div>
+
+    <!-- Modal para colores -->
+    <div id="colorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="colorModalTitle">Seleccionar color</h3>
+                <span class="close" onclick="closeModal('colorModal')">&times;</span>
+            </div>
+            <div class="color-palette">
+                <div class="color-option" style="background: #000000;" onclick="selectColor('#000000')"></div>
+                <div class="color-option" style="background: #2563eb;" onclick="selectColor('#2563eb')"></div>
+                <div class="color-option" style="background: #dc2626;" onclick="selectColor('#dc2626')"></div>
+                <div class="color-option" style="background: #16a34a;" onclick="selectColor('#16a34a')"></div>
+                <div class="color-option" style="background: #ca8a04;" onclick="selectColor('#ca8a04')"></div>
+                <div class="color-option" style="background: #9333ea;" onclick="selectColor('#9333ea')"></div>
+                <div class="color-option" style="background: #e11d48;" onclick="selectColor('#e11d48')"></div>
+                <div class="color-option" style="background: #0891b2;" onclick="selectColor('#0891b2')"></div>
+                <div class="color-option" style="background: #4f46e5;" onclick="selectColor('#4f46e5')"></div>
+                <div class="color-option" style="background: #ea580c;" onclick="selectColor('#ea580c')"></div>
+            </div>
+            <div style="margin-top: 20px;">
+                <label for="customColor">O introduce un color personalizado:</label>
+                <input type="color" id="customColor" onchange="selectColor(this.value)"
+                    style="margin-top: 8px; width: 100%; height: 40px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para terminal -->
+    <div id="terminalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Insertar terminal</h3>
+                <span class="close" onclick="closeModal('terminalModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="terminal-user">Usuario</label>
+                <input type="text" id="terminal-user" value="usuario@ubuntu">
+            </div>
+            <div class="form-group">
+                <label for="terminal-directory">Directorio</label>
+                <input type="text" id="terminal-directory" value="~/proyecto">
+            </div>
+            <div class="form-group">
+                <label for="terminal-command">Comando</label>
+                <input type="text" id="terminal-command" placeholder="ls -la">
+            </div>
+            <div class="form-group">
+                <label for="terminal-output">Salida del comando</label>
+                <textarea id="terminal-output" rows="5" placeholder="Salida del comando..."></textarea>
+            </div>
+
+            <h4>Comandos predefinidos</h4>
+            <div class="terminal-commands">
+                <button class="terminal-btn"
+                    onclick="setTerminalCommand('ls -la', 'total 64\ndrwxr-xr-x 24 user user  4096 Jun 12 10:30 .\ndrwxr-xr-x  3 user user  4096 May 15 09:12 ..\n-rw-r--r--  1 user user   310 Jun 11 14:22 index.html\n-rw-r--r--  1 user user  1852 Jun 10 16:45 styles.css\ndrwxr-xr-x  2 user user  4096 Jun  5 11:20 images')">ls
+                    -la (listar archivos)</button>
+
+                <button class="terminal-btn"
+                    onclick="setTerminalCommand('git status', 'On branch main\nYour branch is up to date with \"
+                    origin/main\".\n\nChanges not staged for commit:\n (use \"git add <file>...\" to update what will be
+                    committed)\n (use \"git restore <file>...\" to discard changes in working directory)\n modified:
+                        index.html\n modified: styles.css\n\nno changes added to commit (use \"git add\" and/or \"git
+                        commit -a\")')">git status (estado repositorio)</button>
+
+                <button class="terminal-btn" onclick="setTerminalCommand('python --version', 'Python 3.9.7')">python
+                    --version (versión de Python)</button>
+
+                <button class="terminal-btn" onclick="setTerminalCommand('node -v', 'v16.14.2')">node -v (versión de
+                    Node.js)</button>
+
+                <button class="terminal-btn"
+                    onclick="setTerminalCommand('docker ps', 'CONTAINER ID   IMAGE         COMMAND                  CREATED       STATUS       PORTS     NAMES\na1b2c3d4e5f6   nginx:latest  \"
+                    /docker-entrypoint.…\" 2 hours ago Up 2 hours 80/tcp webserver')">docker ps (contenedores
+                    activos)</button>
+
+                <button class="terminal-btn"
+                    onclick="setTerminalCommand('npm install react', 'added 42 packages, and audited 143 packages in 5s\n\n12 packages are looking for funding\n  run `npm fund` for details\n\nfound 0 vulnerabilities')">npm
+                    install react (instalar paquete)</button>
+            </div>
+
+            <button class="btn btn-primary" onclick="insertElementAtCursor('terminal')"
+                style="margin-top: 20px;">Insertar terminal</button>
+        </div>
+    </div>
+
+    <!-- Modal para código -->
+    <div id="codeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Insertar código</h3>
+                <span class="close" onclick="closeModal('codeModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="code-language">Lenguaje</label>
+                <select id="code-language">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="csharp">C#</option>
+                    <option value="cpp">C++</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="php">PHP</option>
+                    <option value="sql">SQL</option>
+                    <option value="bash">Bash/Shell</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="code-content">Código</label>
+                <textarea id="code-content" rows="10" placeholder="Escribe tu código aquí..."
+                    style="font-family: 'Courier New', monospace;"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="insertElementAtCursor('code')">Insertar código</button>
+        </div>
+    </div>
+
+    <!-- Modal para CodeSnap -->
+    <div id="codesnapModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Crear CodeSnap</h3>
+                <span class="close" onclick="closeModal('codesnapModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="codesnap-language">Lenguaje</label>
+                <select id="codesnap-language">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="csharp">C#</option>
+                    <option value="cpp">C++</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="php">PHP</option>
+                    <option value="sql">SQL</option>
+                    <option value="bash">Bash/Shell</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="codesnap-content">Código</label>
+                <textarea id="codesnap-content" rows="10" placeholder="Escribe tu código aquí..."
+                    style="font-family: 'Courier New', monospace;"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="codesnap-theme">Tema</label>
+                <select id="codesnap-theme">
+                    <option value="atom-one-dark">Atom One Dark</option>
+                    <option value="github-dark">GitHub Dark</option>
+                    <option value="vs2015">Visual Studio 2015</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="insertElementAtCursor('codesnap')">Insertar CodeSnap</button>
+        </div>
+    </div>
+
+    <!-- Modal para iconos -->
+    <div id="iconModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Insertar icono</h3>
+                <span class="close" onclick="closeModal('iconModal')">&times;</span>
+            </div>
+
+            <div class="icon-preview">
+                <span id="icon-preview-element" class="inline-icon icon-medium">
+                    <i class="fas fa-heart" style="color: #2563eb;"></i>
+                </span>
+                <div>
+                    <h4 id="icon-preview-name">fa-heart</h4>
+                    <p id="icon-preview-code">Icono en línea</p>
+                </div>
+            </div>
+
+            <div class="icon-size-control">
+                <label for="icon-size">Tamaño:</label>
+                <select id="icon-size" onchange="updateIconPreview()">
+                    <option value="icon-small">Pequeño</option>
+                    <option value="icon-medium" selected>Mediano</option>
+                    <option value="icon-large">Grande</option>
+                    <option value="icon-x-large">Extra Grande</option>
+                </select>
+            </div>
+
+            <div class="icon-color-control">
+                <label for="icon-color">Color:</label>
+                <input type="color" id="icon-color" value="#2563eb" onchange="updateIconPreview()">
+            </div>
+
+            <div class="icon-categories">
+                <button class="icon-category-btn active" onclick="filterIcons('all')">Todos</button>
+                <button class="icon-category-btn" onclick="filterIcons('technology')">Tecnología</button>
+                <button class="icon-category-btn" onclick="filterIcons('social')">Social</button>
+                <button class="icon-category-btn" onclick="filterIcons('file')">Archivos</button>
+                <button class="icon-category-btn" onclick="filterIcons('interface')">Interfaz</button>
+            </div>
+
+            <div class="icon-grid" id="icon-grid">
+                <!-- Los iconos se cargarán dinámicamente con JavaScript -->
+            </div>
+
+            <button class="btn btn-primary" onclick="insertElementAtCursor('icon')" style="margin-top: 20px;">
+                <i class="fas fa-plus"></i> Insertar icono
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar el HTML generado -->
+    <div id="htmlModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>Código HTML generado</h3>
+                <span class="close" onclick="closeModal('htmlModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="generated-html">Copia este código para integrarlo en tu blog:</label>
+                <textarea id="generated-html"
+                    style="width: 100%; min-height: 300px; font-family: monospace; padding: 15px;" readonly></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> Copiar al portapapeles
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales
+        let currentColorCommand = '';
+        let selectedIcon = 'fa-heart';
+        let lastCursorPosition = null;
+        let isModalOpen = false;
+
+        // Lista de iconos por categorías
+        const iconCategories = {
+            all: [
+                'fa-heart', 'fa-star', 'fa-thumbs-up', 'fa-check', 'fa-code',
+                'fa-terminal', 'fa-desktop', 'fa-laptop', 'fa-database', 'fa-server',
+                'fa-network-wired', 'fa-cloud', 'fa-globe', 'fa-link', 'fa-shield-alt',
+                'fa-lock', 'fa-unlock', 'fa-key', 'fa-user', 'fa-users',
+                'fa-envelope', 'fa-paper-plane', 'fa-bell', 'fa-bookmark', 'fa-flag',
+                'fa-folder', 'fa-folder-open', 'fa-file', 'fa-file-code', 'fa-file-alt',
+                'fa-copy', 'fa-save', 'fa-trash', 'fa-download', 'fa-upload',
+                'fa-search', 'fa-cog', 'fa-wrench', 'fa-sync', 'fa-plus',
+                'fa-minus', 'fa-times', 'fa-info', 'fa-question', 'fa-exclamation',
+                'fa-arrow-right', 'fa-arrow-left', 'fa-arrow-up', 'fa-arrow-down', 'fa-expand',
+                'fa-compress', 'fa-external-link-alt', 'fa-bars', 'fa-filter', 'fa-sort'
+            ],
+            technology: [
+                'fa-code', 'fa-terminal', 'fa-desktop', 'fa-laptop', 'fa-database',
+                'fa-server', 'fa-network-wired', 'fa-cloud', 'fa-globe', 'fa-link',
+                'fa-shield-alt', 'fa-lock', 'fa-unlock', 'fa-key', 'fa-microchip'
+            ],
+            social: [
+                'fa-heart', 'fa-star', 'fa-thumbs-up', 'fa-user', 'fa-users',
+                'fa-envelope', 'fa-paper-plane', 'fa-comment', 'fa-comments', 'fa-share-alt'
+            ],
+            file: [
+                'fa-folder', 'fa-folder-open', 'fa-file', 'fa-file-code', 'fa-file-alt',
+                'fa-copy', 'fa-save', 'fa-trash', 'fa-download', 'fa-upload'
+            ],
+            interface: [
+                'fa-search', 'fa-cog', 'fa-wrench', 'fa-bars', 'fa-filter',
+                'fa-sort', 'fa-plus', 'fa-minus', 'fa-times', 'fa-check',
+                'fa-arrow-right', 'fa-arrow-left', 'fa-arrow-up', 'fa-arrow-down',
+                'fa-expand', 'fa-compress', 'fa-external-link-alt'
+            ]
+        };
+
+        // Función para actualizar la información del cursor
+        function updateCursorInfo(message = null) {
+            const cursorInfo = document.getElementById('cursor-info');
+            if (message) {
+                cursorInfo.innerHTML = `✅ <strong>${message}</strong>`;
+                cursorInfo.style.borderLeftColor = 'var(--success)';
+
+                // Restaurar mensaje original después de 3 segundos
+                setTimeout(() => {
+                    cursorInfo.innerHTML = '💡 <strong>Posición del cursor:</strong> Haz clic en cualquier parte del texto para posicionar el cursor. Todos los elementos se insertarán exactamente donde está el cursor.';
+                    cursorInfo.style.borderLeftColor = 'var(--primary)';
+                }, 3000);
+            }
+        }
+
+        // ========== CURSOR ==========
+
+        // Guardar posición del cursor
+        function saveCursorPosition() {
+            // No guardar posición si hay un modal abierto
+            if (isModalOpen) return;
+
+            const editor = document.getElementById('post-content');
+            lastCursorPosition = getCurrentCursorPosition(editor);
+        }
+
+        // Obtener posición actual del cursor - VERSIÓN MEJORADA
+        function getCurrentCursorPosition(element) {
+            let selection = window.getSelection();
+            if (selection.rangeCount === 0) return null;
+
+            let range = selection.getRangeAt(0);
+            let clonedRange = range.cloneRange();
+
+            return {
+                range: clonedRange,
+                startContainer: range.startContainer,
+                startOffset: range.startOffset,
+                endContainer: range.endContainer,
+                endOffset: range.endOffset
+            };
+        }
+
+        // Restaurar posición del cursor - VERSIÓN MEJORADA
+        function restoreCursorPosition(position) {
+            if (!position) return false;
+
+            try {
+                let selection = window.getSelection();
+                selection.removeAllRanges();
+
+                // Crear un nuevo rango con la posición guardada
+                let newRange = document.createRange();
+                newRange.setStart(position.startContainer, position.startOffset);
+                newRange.setEnd(position.endContainer, position.endOffset);
+
+                selection.addRange(newRange);
+                return true;
+            } catch (e) {
+                console.warn('No se pudo restaurar la posición del cursor:', e);
+                return false;
+            }
+        }
+
+        // Insertar HTML en la posición del cursor - VERSIÓN MEJORADA
+        function insertHTMLAtCursor(html) {
+            const editor = document.getElementById('post-content');
+
+            // Enfocar el editor primero
+            editor.focus();
+
+            // Intentar restaurar la posición guardada
+            if (lastCursorPosition && restoreCursorPosition(lastCursorPosition)) {
+                try {
+                    // Usar insertHTML para mejor compatibilidad
+                    document.execCommand('insertHTML', false, html);
+                } catch (e) {
+                    // Fallback: insertar al final
+                    editor.innerHTML += html;
+                }
+            } else {
+                // Fallback: usar execCommand sin posición específica
+                document.execCommand('insertHTML', false, html);
+            }
+
+            updatePreview();
+            updateCursorInfo('Elemento insertado correctamente');
+
+            // Guardar la nueva posición después de insertar
+            setTimeout(() => saveCursorPosition(), 100);
+        }
+
+        // ========== ICONOS ==========
+
+        // Función para cargar iconos en la rejilla
+        function loadIcons(category = 'all') {
+            const iconGrid = document.getElementById('icon-grid');
+            iconGrid.innerHTML = '';
+
+            iconCategories[category].forEach(icon => {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-item';
+                iconItem.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span class="icon-name">${icon.replace('fa-', '')}</span>
+        `;
+                iconItem.addEventListener('click', function () {
+                    selectIcon(icon, this);
+                });
+                iconGrid.appendChild(iconItem);
+            });
+
+            // Seleccionar automáticamente el primer icono
+            if (iconGrid.firstChild) {
+                selectIcon(iconCategories[category][0], iconGrid.firstChild);
+            }
+        }
+
+        // Función para seleccionar un icono
+        function selectIcon(icon, element) {
+            selectedIcon = icon;
+
+            // Remover selección anterior
+            document.querySelectorAll('.icon-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Añadir selección actual
+            if (element) {
+                element.classList.add('selected');
+            }
+
+            updateIconPreview();
+        }
+
+        // Función para actualizar la vista previa del icono
+        function updateIconPreview() {
+            const size = document.getElementById('icon-size').value;
+            const color = document.getElementById('icon-color').value;
+            const previewElement = document.getElementById('icon-preview-element');
+            const iconName = document.getElementById('icon-preview-name');
+            const iconCode = document.getElementById('icon-preview-code');
+
+            // Limpiar y actualizar la vista previa
+            previewElement.innerHTML = '';
+            const iconElement = document.createElement('i');
+            iconElement.className = `fas ${selectedIcon}`;
+            iconElement.style.color = color;
+            previewElement.appendChild(iconElement);
+
+            previewElement.className = `inline-icon ${size}`;
+            iconName.textContent = selectedIcon;
+            iconCode.textContent = `<i class="fas ${selectedIcon}"></i>`;
+        }
+
+        // Función para filtrar iconos por categoría
+        function filterIcons(category) {
+            // Actualizar botones de categoría
+            document.querySelectorAll('.icon-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Cargar iconos de la categoría seleccionada
+            loadIcons(category);
+        }
+
+        // ========== INSERCIÓN ==========
+
+        // Función principal para insertar elementos
+        function insertElementAtCursor(type) {
+            saveCursorPosition(); // Guardar posición actual antes de insertar
+
+            let html = '';
+
+            switch (type) {
+                case 'icon':
+                    const size = document.getElementById('icon-size').value;
+                    const color = document.getElementById('icon-color').value;
+                    html = `<span class="inline-icon ${size}" contenteditable="false"><i class="fas ${selectedIcon}" style="color: ${color};"></i></span>`;
+                    closeModal('iconModal');
+                    break;
+
+                case 'link':
+                    const url = document.getElementById('link-url').value;
+                    const text = document.getElementById('link-text').value || 'Enlace';
+                    if (!url) {
+                        alert('Por favor, introduce una URL');
+                        return;
+                    }
+                    html = `<a href="${url}" target="_blank">${text}</a>`;
+                    closeModal('linkModal');
+                    break;
+
+                case 'image':
+                    const imageUrl = document.getElementById('image-url').value;
+                    const alt = document.getElementById('image-alt').value;
+                    const width = document.getElementById('image-width').value;
+                    const align = document.getElementById('image-align').value;
+                    if (!imageUrl) {
+                        alert('Por favor, introduce la URL de la imagen');
+                        return;
+                    }
+                    const widthAttr = width ? ` width="${width}"` : '';
+                    const alignClass = `image-${align}`;
+                    html = `<img src="${imageUrl}" alt="${alt || 'Imagen'}"${widthAttr} class="${alignClass}" style="max-width: 100%;" contenteditable="false">`;
+                    closeModal('imageModal');
+                    break;
+
+                case 'video':
+                    const videoUrl = document.getElementById('video-url').value;
+                    const videoWidth = document.getElementById('video-width').value || '560';
+                    const videoHeight = document.getElementById('video-height').value || '315';
+                    if (!videoUrl) {
+                        alert('Por favor, introduce la URL del video');
+                        return;
+                    }
+                    html = `<iframe width="${videoWidth}" height="${videoHeight}" src="${videoUrl}" frameborder="0" allowfullscreen style="border: none;" contenteditable="false"></iframe>`;
+                    closeModal('videoModal');
+                    break;
+
+                case 'table':
+                    const rows = parseInt(document.getElementById('table-rows').value);
+                    const cols = parseInt(document.getElementById('table-cols').value);
+                    const hasHeader = document.getElementById('table-header').checked;
+
+                    if (rows > 0 && cols > 0) {
+                        let tableHTML = '<div class="table-container"><table><tbody>';
+
+                        if (hasHeader) {
+                            tableHTML += '<tr>';
+                            for (let i = 0; i < cols; i++) {
+                                tableHTML += '<th>Encabezado ' + (i + 1) + '</th>';
+                            }
+                            tableHTML += '</tr>';
+                        }
+
+                        for (let i = 0; i < rows; i++) {
+                            tableHTML += '<tr>';
+                            for (let j = 0; j < cols; j++) {
+                                tableHTML += '<td>Celda ' + (i + 1) + '-' + (j + 1) + '</td>';
+                            }
+                            tableHTML += '</tr>';
+                        }
+
+                        tableHTML += '</tbody></table></div>';
+                        html = tableHTML;
+                        closeModal('tableModal');
+                    }
+                    break;
+
+                case 'terminal':
+                    const user = document.getElementById('terminal-user').value;
+                    const directory = document.getElementById('terminal-directory').value;
+                    const command = document.getElementById('terminal-command').value;
+                    const output = document.getElementById('terminal-output').value;
+
+                    if (command) {
+                        const terminalHTML = `
+                    <div class="terminal" contenteditable="false">
+                        <div class="terminal-header">
+                            <div class="terminal-controls">
+                                <div class="terminal-control close"></div>
+                                <div class="terminal-control minimize"></div>
+                                <div class="terminal-control maximize"></div>
+                            </div>
+                            <div class="terminal-title">Terminal</div>
+                            <div></div>
+                        </div>
+                        <div class="terminal-body">
+                            <div>
+                                <span class="prompt">${user}:${directory}$</span>
+                                <span class="command">${command}</span>
+                            </div>
+                            <div class="output">${formatTerminalOutput(output)}</div>
+                        </div>
+                    </div>
+                `;
+                        html = terminalHTML;
+                        closeModal('terminalModal');
+                    } else {
+                        alert('Por favor, introduce un comando');
+                        return;
+                    }
+                    break;
+
+                case 'code':
+                    const language = document.getElementById('code-language').value;
+                    const code = document.getElementById('code-content').value;
+
+                    if (code) {
+                        const codeHTML = `
+                    <div class="code-block" contenteditable="false">
+                        <div class="code-header">
+                            <span>Código ${language.toUpperCase()}</span>
+                            <span class="code-lang">${language}</span>
+                        </div>
+                        <pre><code class="language-${language}">${escapeHtml(code)}</code></pre>
+                    </div>
+                `;
+                        html = codeHTML;
+                        closeModal('codeModal');
+                    } else {
+                        alert('Por favor, introduce el código');
+                        return;
+                    }
+                    break;
+
+                case 'codesnap':
+                    const csLanguage = document.getElementById('codesnap-language').value;
+                    const csCode = document.getElementById('codesnap-content').value;
+                    const theme = document.getElementById('codesnap-theme').value;
+
+                    if (csCode) {
+                        const codesnapHTML = `
+                    <div class="codesnap" contenteditable="false">
+                        <div class="codesnap-header">
+                            <div class="codesnap-window-controls">
+                                <div class="codesnap-control red"></div>
+                                <div class="codesnap-control yellow"></div>
+                                <div class="codesnap-control green"></div>
+                            </div>
+                            <div>${csLanguage.toUpperCase()}</div>
+                            <div></div>
+                        </div>
+                        <div class="codesnap-body">
+                            <pre><code class="language-${csLanguage}">${escapeHtml(csCode)}</code></pre>
+                        </div>
+                        <div class="codesnap-actions">
+                            <button class="codesnap-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                            <button class="codesnap-btn" onclick="downloadCode(this)"><i class="fas fa-download"></i> Descargar</button>
+                        </div>
+                    </div>
+                `;
+                        html = codesnapHTML;
+                        closeModal('codesnapModal');
+                    } else {
+                        alert('Por favor, introduce el código');
+                        return;
+                    }
+                    break;
+            }
+
+            if (html) {
+                insertHTMLAtCursor(html);
+
+                // Aplicar resaltado de sintaxis si es código
+                if (type === 'code' || type === 'codesnap') {
+                    setTimeout(() => {
+                        document.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                        });
+                    }, 100);
+                }
+            }
+        }
+
+        // ========== FUNCIONES AUXILIARES ==========
+
+        // Función para formatear texto usando document.execCommand
+        function formatText(command, value = null) {
+            const editor = document.getElementById('post-content');
+            editor.focus();
+
+            // Guardar posición antes de formatear
+            saveCursorPosition();
+
+            try {
+                if (value) {
+                    document.execCommand(command, false, value);
+                } else {
+                    document.execCommand(command, false, null);
+                }
+            } catch (e) {
+                console.warn('Error al ejecutar comando:', e);
+            }
+
+            updatePreview();
+        }
+
+        // Función para formatear la salida de terminal
+        function formatTerminalOutput(output) {
+            let formattedOutput = output.replace(/\n/g, '<br>');
+            formattedOutput = formattedOutput.replace(/(drwxr-xr-x)/g, '<span class="dir">$1</span>');
+            formattedOutput = formattedOutput.replace(/(\-rw-r--r--)/g, '<span class="file">$1</span>');
+            formattedOutput = formattedOutput.replace(/(total \d+)/g, '<span class="highlight">$1</span>');
+            return formattedOutput;
+        }
+
+        // Función para escapar HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Funciones para CodeSnap
+        function copyCode(button) {
+            const code = button.closest('.codesnap').querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        function downloadCode(button) {
+            const code = button.closest('.codesnap').querySelector('code').textContent;
+            const language = button.closest('.codesnap').querySelector('.codesnap-header div:nth-child(2)').textContent;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `codigo.${language.toLowerCase()}`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ========== MODALES ==========
+
+        function showIconModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            loadIcons();
+            document.getElementById('iconModal').style.display = 'flex';
+        }
+
+        function showLinkModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            const selection = window.getSelection().toString();
+            document.getElementById('link-text').value = selection;
+            document.getElementById('linkModal').style.display = 'flex';
+        }
+
+        function showImageModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function showVideoModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            document.getElementById('videoModal').style.display = 'flex';
+        }
+
+        function showTableModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            document.getElementById('tableModal').style.display = 'flex';
+        }
+
+        function showTerminalModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            document.getElementById('terminalModal').style.display = 'flex';
+        }
+
+        function showCodeModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            document.getElementById('codeModal').style.display = 'flex';
+        }
+
+        function showCodeSnapModal() {
+            saveCursorPosition();
+            isModalOpen = true;
+            document.getElementById('codesnapModal').style.display = 'flex';
+        }
+
+        function showColorModal(command) {
+            saveCursorPosition();
+            isModalOpen = true;
+            currentColorCommand = command;
+            document.getElementById('colorModalTitle').textContent =
+                command === 'forecolor' ? 'Seleccionar color de texto' : 'Seleccionar color de fondo';
+            document.getElementById('colorModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            isModalOpen = false;
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function selectColor(color) {
+            const editor = document.getElementById('post-content');
+            editor.focus();
+
+            // Restaurar posición antes de aplicar color
+            if (lastCursorPosition) {
+                restoreCursorPosition(lastCursorPosition);
+            }
+
+            document.execCommand(currentColorCommand, false, color);
+            closeModal('colorModal');
+            updatePreview();
+        }
+
+        function setTerminalCommand(command, output) {
+            document.getElementById('terminal-command').value = command;
+            document.getElementById('terminal-output').value = output;
+        }
+
+        // ========== OTRAS FUNCIONALIDADES ==========
+
+        function updatePreview() {
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').innerHTML;
+
+            let previewHTML = '';
+
+            if (title) {
+                previewHTML += `<h1>${title}</h1>`;
+            }
+
+            if (content) {
+                previewHTML += content;
+            } else {
+                previewHTML = '<p>La vista previa de tu entrada aparecerá aquí...</p>';
+            }
+
+            document.getElementById('post-preview').innerHTML = previewHTML;
+
+            // Aplicar resaltado de sintaxis a los bloques de código
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        function clearContent() {
+            if (confirm('¿Estás seguro de que quieres limpiar todo el contenido?')) {
+                document.getElementById('post-title').value = '';
+                document.getElementById('post-content').innerHTML = '<p>¡Bienvenido al editor mejorado! Este es un texto de ejemplo.</p><p>Puedes hacer clic en cualquier parte de este texto y luego insertar elementos exactamente en esa posición.</p><p>Prueba a colocar el cursor aquí → [posición] ← y luego insertar un icono, imagen, tabla, etc.</p>';
+                updatePreview();
+            }
+        }
+
+        function generateHTML() {
+            const title = document.getElementById('post-title').value;
+            const content = document.getElementById('post-content').innerHTML;
+
+            if (!title && !content) {
+                alert('Por favor, escribe algo antes de generar el HTML');
+                return;
+            }
+
+            let htmlCode = '';
+
+            if (title) {
+                htmlCode += `<h1>${title}</h1>\n`;
+            }
+
+            if (content) {
+                htmlCode += content;
+            }
+
+            document.getElementById('generated-html').value = htmlCode;
+            document.getElementById('htmlModal').style.display = 'flex';
+        }
+
+        function copyToClipboard() {
+            const htmlTextarea = document.getElementById('generated-html');
+            htmlTextarea.select();
+            document.execCommand('copy');
+
+            // Mostrar confirmación visual
+            const copyButton = document.querySelector('#htmlModal .btn-primary');
+            const originalText = copyButton.innerHTML;
+            copyButton.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+
+            setTimeout(() => {
+                copyButton.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // ========== INICIALIZACIÓN ==========
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Inicializar eventos del editor
+            const editor = document.getElementById('post-content');
+
+            editor.addEventListener('click', function () {
+                if (!isModalOpen) {
+                    setTimeout(() => saveCursorPosition(), 50);
+                }
+            });
+
+            editor.addEventListener('keyup', function () {
+                if (!isModalOpen) {
+                    setTimeout(() => saveCursorPosition(), 50);
+                }
+                updatePreview();
+            });
+
+            // Evento para el título
+            document.getElementById('post-title').addEventListener('keyup', updatePreview);
+
+            // Cerrar modales al hacer clic fuera
+            window.addEventListener('click', function (event) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                        isModalOpen = false;
+                    }
+                });
+            });
+
+            // Cerrar modales con Escape
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    const modals = document.querySelectorAll('.modal');
+                    modals.forEach(modal => {
+                        if (modal.style.display === 'flex') {
+                            modal.style.display = 'none';
+                            isModalOpen = false;
+                        }
+                    });
+                }
+            });
+
+            // Inicializar la vista previa
+            updatePreview();
+
+            // Inicializar resaltado de sintaxis
+            hljs.highlightAll();
+
+            // Inicializar iconos
+            loadIcons();
+        });
+    </script>
+</body>
+
+</html>
