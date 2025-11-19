@@ -1788,28 +1788,40 @@
             }
         }
 
-        function generateHTML() {
-            const title = document.getElementById('post-title').value;
-            const content = document.getElementById('post-content').innerHTML;
+     function generateHTML() {
+    const title = document.getElementById('post-title').value;
+    let content = document.getElementById('post-content').innerHTML;
 
-            if (!title && !content) {
-                alert('Por favor, escribe algo antes de generar el HTML');
-                return;
-            }
+    if (!title && !content) {
+        alert('Por favor, escribe algo antes de generar el HTML');
+        return;
+    }
 
-            let htmlCode = '';
+    let htmlCode = '';
 
-            if (title) {
-                htmlCode += `<h1>${title}</h1>\n`;
-            }
+    if (title) {
+        htmlCode += `<h1>${title}</h1>\n`;
+    }
 
-            if (content) {
-                htmlCode += content;
-            }
+    if (content) {
+        // Primero aplicar estilos básicos CORRECTAMENTE
+        content = content.replace(/<b>/g, '<b style="font-weight: bold;">')
+                       .replace(/<i>/g, '<i style="font-style: italic;">')
+                       .replace(/<u>/g, '<u style="text-decoration: underline;">');
+        
+        // Luego procesar los saltos de línea
+        content = content.replace(/<\/p>/g, '<br>')
+                       .replace(/<p>/g, '')
+                       .replace(/<\/div><div>/g, '<br>')
+                       .replace(/<div>/g, '')
+                       .replace(/<\/div>/g, '<br>');
+        
+        htmlCode += content;
+    }
 
-            document.getElementById('generated-html').value = htmlCode;
-            document.getElementById('htmlModal').style.display = 'flex';
-        }
+    document.getElementById('generated-html').value = htmlCode;
+    document.getElementById('htmlModal').style.display = 'flex';
+}
 
         function copyToClipboard() {
             const htmlTextarea = document.getElementById('generated-html');
